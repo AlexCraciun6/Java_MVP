@@ -140,6 +140,11 @@ public class MuseumPresenter {
 
     // Metode pentru gestionarea operelor de artă
 
+    public void getAllArtworks() {
+        List<Artwork> artworks = artworkRepository.getAllArtworks();
+        museumGUI.setArtworkList(artworks);
+    }
+
     public void addArtwork() {
         try {
             String title = museumGUI.getArtworkTitle();
@@ -259,6 +264,32 @@ public class MuseumPresenter {
             }
         } catch (Exception e) {
             museumGUI.showMessage("Error", e.getMessage());
+        }
+    }
+
+    public void loadArtists() {
+        try {
+            List<Artist> artists = artistRepository.getAllArtists();
+            if (artists.isEmpty()) {
+                museumGUI.showMessage("Info", "No artists found in the database!");
+            } else {
+                museumGUI.setArtistList(artists);
+            }
+        } catch (Exception e) {
+            museumGUI.showMessage("Error", "Failed to load artists: " + e.getMessage());
+        }
+    }
+
+    public void loadArtworks() {
+        try {
+            List<Artwork> artworks = artworkRepository.getAllArtworks();
+            if (artworks.isEmpty()) {
+                museumGUI.showMessage("Info", "No artworks found in the database!");
+            } else {
+                museumGUI.setArtworkList(artworks);
+            }
+        } catch (Exception e) {
+            museumGUI.showMessage("Error", "Failed to load artworks: " + e.getMessage());
         }
     }
 

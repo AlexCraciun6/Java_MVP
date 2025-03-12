@@ -36,4 +36,7 @@ public interface IMuseumGUI {
     void searchArtworkButtonClicked();
     void saveArtworksToCSVButtonClicked();
     void saveArtworksToDOCButtonClicked();
+
+    void loadArtistsButtonClicked();
+    void loadArtworksButtonClicked();
 }

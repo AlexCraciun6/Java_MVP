@@ -18,6 +18,7 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
     private JButton btnAddArtist, btnUpdateArtist, btnDeleteArtist, btnSearchArtist;
     private JButton btnAddArtwork, btnUpdateArtwork, btnDeleteArtwork, btnSearchArtwork;
     private JButton btnSaveArtworksToCSV, btnSaveArtworksToDOC;
+    private JButton btnLoadArtists, btnLoadArtworks;
     private JTable tblArtists, tblArtworks;
     private JComboBox<String> cbArtistFilter, cbArtworkFilter;
 
@@ -43,6 +44,7 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
 
         // Adăugare listeneri pentru butoane
         registerListeners();
+
 
         // Afișare frame
         setVisible(true);
@@ -78,6 +80,11 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
         btnSaveArtworksToCSV = new JButton("Save to CSV");
         btnSaveArtworksToDOC = new JButton("Save to DOC");
 
+
+        // Butoane pentru încărcarea datelor
+        btnLoadArtists = new JButton("Load Artists");
+        btnLoadArtworks = new JButton("Load Artworks");
+
         // Tabele
         tblArtists = new JTable();
         tblArtworks = new JTable();
@@ -104,6 +111,11 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
         btnSaveArtworksToCSV.addActionListener(e -> saveArtworksToCSVButtonClicked());
         btnSaveArtworksToDOC.addActionListener(e -> saveArtworksToDOCButtonClicked());
 
+        btnLoadArtists.addActionListener(e -> loadArtistsButtonClicked());
+
+        // Listener pentru butonul de încărcare opere de artă
+        btnLoadArtworks.addActionListener(e -> loadArtworksButtonClicked());
+
         // Implementare selectare rând în tabele pentru a popula câmpurile
         tblArtists.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblArtists.getSelectedRow() != -1) {
@@ -128,6 +140,7 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
             }
         });
     }
+
 
     private JPanel createArtistPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -203,6 +216,8 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
 
     private JPanel createButtonPanel() {
         JPanel panel = new JPanel();
+        panel.add(btnLoadArtists);
+        panel.add(btnLoadArtworks);
         panel.add(btnSaveArtworksToCSV);
         panel.add(btnSaveArtworksToDOC);
         return panel;
@@ -369,6 +384,16 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
     @Override
     public void saveArtworksToDOCButtonClicked() {
         museumPresenter.saveArtworksToDOC();
+    }
+
+    @Override
+    public void loadArtistsButtonClicked() {
+        museumPresenter.loadArtists();
+    }
+
+    @Override
+    public void loadArtworksButtonClicked() {
+        museumPresenter.loadArtworks();
     }
 
     public static void main(String[] args) {

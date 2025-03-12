@@ -19,7 +19,7 @@ public class Repository {
             Class.forName("org.sqlite.JDBC");
             // Conectează-te la baza de date (crează fișierul dacă nu există)
             connection = DriverManager.getConnection("jdbc:sqlite:d:/AN3/sem2/PS/tema1_java/muzeu.db");
-            System.out.println("Conexiunea la baza de date a fost deschisă.");
+//            System.out.println("Conexiunea la baza de date a fost deschisă.");
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
