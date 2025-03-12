@@ -1,11 +1,5 @@
 package presenter;
 
-import model.Artist;
-import model.Artwork;
-
-import javax.swing.*;
-import java.util.List;
-
 public interface IMuseumGUI {
     // Metode pentru obținerea datelor din interfață
     String getArtistName();
@@ -21,8 +15,8 @@ public interface IMuseumGUI {
     String getArtworkImage3();
 
     // Metode pentru afișarea datelor în interfață
-    void setArtistList(List<Artist> artists);
-    void setArtworkList(List<Artwork> artworks);
+    void setArtistTable(Object[][] data, String[] columnNames);
+    void setArtworkTable(Object[][] data, String[] columnNames);
     void showMessage(String title, String message);
 
     // Metode pentru gestionarea evenimentelor
@@ -37,6 +31,7 @@ public interface IMuseumGUI {
     void saveArtworksToCSVButtonClicked();
     void saveArtworksToDOCButtonClicked();
 
+    // Metode pentru încărcarea datelor
     void loadArtistsButtonClicked();
     void loadArtworksButtonClicked();
 }

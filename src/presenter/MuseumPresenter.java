@@ -38,7 +38,7 @@ public class MuseumPresenter {
 
             if (result) {
                 museumGUI.showMessage("Success", "Artist added successfully!");
-                museumGUI.setArtistList(artistRepository.getAllArtists());
+                loadArtists();
             } else {
                 museumGUI.showMessage("Error", "Failed to add artist!");
             }
@@ -80,7 +80,7 @@ public class MuseumPresenter {
 
             if (result) {
                 museumGUI.showMessage("Success", "Artist updated successfully!");
-                museumGUI.setArtistList(artistRepository.getAllArtists());
+                loadArtists();
             } else {
                 museumGUI.showMessage("Error", "Failed to update artist!");
             }
@@ -110,7 +110,7 @@ public class MuseumPresenter {
 
             if (result) {
                 museumGUI.showMessage("Success", "Artist deleted successfully!");
-                museumGUI.setArtistList(artistRepository.getAllArtists());
+                loadArtists();
             } else {
                 museumGUI.showMessage("Error", "Failed to delete artist!");
             }
@@ -131,7 +131,7 @@ public class MuseumPresenter {
             if (artists.isEmpty()) {
                 museumGUI.showMessage("Info", "No artists found!");
             } else {
-                museumGUI.setArtistList(artists);
+                displayArtists(artists);
             }
         } catch (Exception e) {
             museumGUI.showMessage("Error", e.getMessage());
@@ -139,11 +139,6 @@ public class MuseumPresenter {
     }
 
     // Metode pentru gestionarea operelor de artă
-
-    public void getAllArtworks() {
-        List<Artwork> artworks = artworkRepository.getAllArtworks();
-        museumGUI.setArtworkList(artworks);
-    }
 
     public void addArtwork() {
         try {
@@ -166,7 +161,7 @@ public class MuseumPresenter {
 
             if (result) {
                 museumGUI.showMessage("Success", "Artwork added successfully!");
-                museumGUI.setArtworkList(artworkRepository.getAllArtworks());
+                loadArtworks();
             } else {
                 museumGUI.showMessage("Error", "Failed to add artwork!");
             }
@@ -209,7 +204,7 @@ public class MuseumPresenter {
 
             if (result) {
                 museumGUI.showMessage("Success", "Artwork updated successfully!");
-                museumGUI.setArtworkList(artworkRepository.getAllArtworks());
+                loadArtworks();
             } else {
                 museumGUI.showMessage("Error", "Failed to update artwork!");
             }
@@ -239,7 +234,7 @@ public class MuseumPresenter {
 
             if (result) {
                 museumGUI.showMessage("Success", "Artwork deleted successfully!");
-                museumGUI.setArtworkList(artworkRepository.getAllArtworks());
+                loadArtworks();
             } else {
                 museumGUI.showMessage("Error", "Failed to delete artwork!");
             }
@@ -260,7 +255,7 @@ public class MuseumPresenter {
             if (artworks.isEmpty()) {
                 museumGUI.showMessage("Info", "No artworks found!");
             } else {
-                museumGUI.setArtworkList(artworks);
+                displayArtworks(artworks);
             }
         } catch (Exception e) {
             museumGUI.showMessage("Error", e.getMessage());
@@ -273,7 +268,7 @@ public class MuseumPresenter {
             if (artists.isEmpty()) {
                 museumGUI.showMessage("Info", "No artists found in the database!");
             } else {
-                museumGUI.setArtistList(artists);
+                displayArtists(artists);
             }
         } catch (Exception e) {
             museumGUI.showMessage("Error", "Failed to load artists: " + e.getMessage());
@@ -286,54 +281,88 @@ public class MuseumPresenter {
             if (artworks.isEmpty()) {
                 museumGUI.showMessage("Info", "No artworks found in the database!");
             } else {
-                museumGUI.setArtworkList(artworks);
+                displayArtworks(artworks);
             }
         } catch (Exception e) {
             museumGUI.showMessage("Error", "Failed to load artworks: " + e.getMessage());
         }
     }
 
+    private void displayArtists(List<Artist> artists) {
+        // Convert list of artists to table data format
+        Object[][] data = new Object[artists.size()][6];
+        for (int i = 0; i < artists.size(); i++) {
+            Artist artist = artists.get(i);
+            data[i][0] = artist.getIdArtist();
+            data[i][1] = artist.getNume();
+            data[i][2] = artist.getDataNasterii();
+            data[i][3] = artist.getLocNasterii();
+            data[i][4] = artist.getNationalitate();
+            data[i][5] = artist.getFotografie();
+        }
+
+        String[] columnNames = {"ID", "Name", "Birth Date", "Birth Place", "Nationality", "Photo"};
+        museumGUI.setArtistTable(data, columnNames);
+    }
+
+    private void displayArtworks(List<Artwork> artworks) {
+        // Convert list of artworks to table data format
+        Object[][] data = new Object[artworks.size()][8];
+        for (int i = 0; i < artworks.size(); i++) {
+            Artwork artwork = artworks.get(i);
+            data[i][0] = artwork.getIdArtwork();
+            data[i][1] = artwork.getArtistId();
+            data[i][2] = artwork.getTitlu();
+            data[i][3] = artwork.getTip();
+            data[i][4] = artwork.getDescriere();
+            data[i][5] = artwork.getImagine1();
+            data[i][6] = artwork.getImagine2();
+            data[i][7] = artwork.getImagine3();
+        }
+
+        String[] columnNames = {"ID", "Artist ID", "Title", "Type", "Description", "Image 1", "Image 2", "Image 3"};
+        museumGUI.setArtworkTable(data, columnNames);
+    }
+
     public void saveArtworksToCSV() {
-        return;
-//        try {
-//            List<Artwork> artworks = artworkRepository.getAllArtworks();
-//            if (artworks.isEmpty()) {
-//                museumGUI.showMessage("Error", "No artworks to save!");
-//                return;
-//            }
-//
-//            String filePath = "artworks.csv";
-//            boolean result = artworkRepository.saveArtworksToCSV(artworks, filePath);
-//
-//            if (result) {
-//                museumGUI.showMessage("Success", "Artworks saved to CSV successfully!");
-//            } else {
-//                museumGUI.showMessage("Error", "Failed to save artworks to CSV!");
-//            }
-//        } catch (Exception e) {
-//            museumGUI.showMessage("Error", e.getMessage());
-//        }
+        try {
+            List<Artwork> artworks = artworkRepository.getAllArtworks();
+            if (artworks.isEmpty()) {
+                museumGUI.showMessage("Error", "No artworks to save!");
+                return;
+            }
+
+            String filePath = "artworks.csv";
+            boolean result = artistRepository.saveArtworksToCSV(artworks, filePath);
+
+            if (result) {
+                museumGUI.showMessage("Success", "Artworks saved to CSV successfully!");
+            } else {
+                museumGUI.showMessage("Error", "Failed to save artworks to CSV!");
+            }
+        } catch (Exception e) {
+            museumGUI.showMessage("Error", e.getMessage());
+        }
     }
 
     public void saveArtworksToDOC() {
-        return;
-//        try {
-//            List<Artwork> artworks = artworkRepository.getAllArtworks();
-//            if (artworks.isEmpty()) {
-//                museumGUI.showMessage("Error", "No artworks to save!");
-//                return;
-//            }
-//
-//            String filePath = "artworks.doc";
-//            boolean result = artworkRepository.saveArtworksToDOC(artworks, filePath);
-//
-//            if (result) {
-//                museumGUI.showMessage("Success", "Artworks saved to DOC successfully!");
-//            } else {
-//                museumGUI.showMessage("Error", "Failed to save artworks to DOC!");
-//            }
-//        } catch (Exception e) {
-//            museumGUI.showMessage("Error", e.getMessage());
-//        }
+        try {
+            List<Artwork> artworks = artworkRepository.getAllArtworks();
+            if (artworks.isEmpty()) {
+                museumGUI.showMessage("Error", "No artworks to save!");
+                return;
+            }
+
+            String filePath = "artworks.doc";
+            boolean result = artistRepository.saveArtworksToDOC(artworks, filePath);
+
+            if (result) {
+                museumGUI.showMessage("Success", "Artworks saved to DOC successfully!");
+            } else {
+                museumGUI.showMessage("Error", "Failed to save artworks to DOC!");
+            }
+        } catch (Exception e) {
+            museumGUI.showMessage("Error", e.getMessage());
+        }
     }
 }

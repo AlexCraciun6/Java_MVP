@@ -1,7 +1,5 @@
 package view;
 
-import model.Artist;
-import model.Artwork;
 import presenter.IMuseumGUI;
 import presenter.MuseumPresenter;
 
@@ -10,7 +8,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 public class MuseumGUI extends JFrame implements IMuseumGUI {
     private JTextField txtArtistName, txtArtistBirthDate, txtArtistBirthPlace, txtArtistNationality, txtArtistPhoto;
@@ -280,54 +277,14 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
     }
 
     @Override
-    public void setArtistList(List<Artist> artists) {
-        DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("ID");
-        model.addColumn("Name");
-        model.addColumn("Birth Date");
-        model.addColumn("Birth Place");
-        model.addColumn("Nationality");
-        model.addColumn("Photo");
-
-        for (Artist artist : artists) {
-            model.addRow(new Object[]{
-                    artist.getIdArtist(),
-                    artist.getNume(),
-                    artist.getDataNasterii(),
-                    artist.getLocNasterii(),
-                    artist.getNationalitate(),
-                    artist.getFotografie()
-            });
-        }
-
+    public void setArtistTable(Object[][] data, String[] columnNames) {
+        DefaultTableModel model = new DefaultTableModel(data, columnNames);
         tblArtists.setModel(model);
     }
 
     @Override
-    public void setArtworkList(List<Artwork> artworks) {
-        DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("ID");
-        model.addColumn("Artist ID");
-        model.addColumn("Title");
-        model.addColumn("Type");
-        model.addColumn("Description");
-        model.addColumn("Image 1");
-        model.addColumn("Image 2");
-        model.addColumn("Image 3");
-
-        for (Artwork artwork : artworks) {
-            model.addRow(new Object[]{
-                    artwork.getIdArtwork(),
-                    artwork.getArtistId(),
-                    artwork.getTitlu(),
-                    artwork.getTip(),
-                    artwork.getDescriere(),
-                    artwork.getImagine1(),
-                    artwork.getImagine2(),
-                    artwork.getImagine3()
-            });
-        }
-
+    public void setArtworkTable(Object[][] data, String[] columnNames) {
+        DefaultTableModel model = new DefaultTableModel(data, columnNames);
         tblArtworks.setModel(model);
     }
 
