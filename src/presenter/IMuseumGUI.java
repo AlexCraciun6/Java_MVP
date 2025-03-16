@@ -34,4 +34,9 @@ public interface IMuseumGUI {
     // Metode pentru încărcarea datelor
     void loadArtistsButtonClicked();
     void loadArtworksButtonClicked();
+
+    // filtering
+    void filterArtworksButtonClicked();
+    String getFilterArtistName();
+    String getFilterArtworkType();
 }

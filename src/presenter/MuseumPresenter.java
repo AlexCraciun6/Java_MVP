@@ -365,4 +365,24 @@ public class MuseumPresenter {
             museumGUI.showMessage("Error", e.getMessage());
         }
     }
+
+    public void filterArtworks(String artistName, String artworkType) {
+        try {
+            if (artistName.isEmpty() && artworkType.isEmpty()) {
+                museumGUI.showMessage("Error", "Please enter at least one filter criteria!");
+                return;
+            }
+
+            List<Artwork> artworks = artistRepository.filterArtworks(artistName, artworkType);
+
+            if (artworks.isEmpty()) {
+                museumGUI.showMessage("Info", "No artworks found matching your criteria!");
+            } else {
+                displayArtworks(artworks);
+                museumGUI.showMessage("Success", "Found " + artworks.size() + " artworks matching your criteria.");
+            }
+        } catch (Exception e) {
+            museumGUI.showMessage("Error", "Error filtering artworks: " + e.getMessage());
+        }
+    }
 }

@@ -18,6 +18,9 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
     private JButton btnLoadArtists, btnLoadArtworks;
     private JTable tblArtists, tblArtworks;
     private JComboBox<String> cbArtistFilter, cbArtworkFilter;
+    private JTextField txtFilterArtist, txtFilterArtworkType;
+    private JButton btnFilterArtworks;
+
 
     private MuseumPresenter museumPresenter;
 
@@ -34,6 +37,7 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
         // Adăugare componente în frame
         add(createArtistPanel(), BorderLayout.WEST);
         add(createArtworkPanel(), BorderLayout.CENTER);
+        add(createFilterPanel(), BorderLayout.NORTH);
         add(createButtonPanel(), BorderLayout.SOUTH);
 
         // Inițializare Presenter
@@ -89,6 +93,11 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
         // Combobox-uri pentru filtrare
         cbArtistFilter = new JComboBox<>(new String[]{"All", "By Name", "By Nationality"});
         cbArtworkFilter = new JComboBox<>(new String[]{"All", "By Title", "By Type"});
+
+        // Filter components
+        txtFilterArtist = new JTextField(15);
+        txtFilterArtworkType = new JTextField(15);
+        btnFilterArtworks = new JButton("Apply Filters");
     }
 
     private void registerListeners() {
@@ -112,6 +121,9 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
 
         // Listener pentru butonul de încărcare opere de artă
         btnLoadArtworks.addActionListener(e -> loadArtworksButtonClicked());
+
+        // Add listener for filter button
+        btnFilterArtworks.addActionListener(e -> filterArtworksButtonClicked());
 
         // Implementare selectare rând în tabele pentru a popula câmpurile
         tblArtists.getSelectionModel().addListSelectionListener(e -> {
@@ -218,6 +230,35 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
         panel.add(btnSaveArtworksToCSV);
         panel.add(btnSaveArtworksToDOC);
         return panel;
+    }
+
+    private JPanel createFilterPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel.setBorder(BorderFactory.createTitledBorder("Filter Artworks"));
+
+        panel.add(new JLabel("Artist Name:"));
+        panel.add(txtFilterArtist);
+        panel.add(new JLabel("Artwork Type:"));
+        panel.add(txtFilterArtworkType);
+        panel.add(btnFilterArtworks);
+
+        return panel;
+    }
+
+    @Override
+    public void filterArtworksButtonClicked() {
+        String artistName = txtFilterArtist.getText().trim();
+        String artworkType = txtFilterArtworkType.getText().trim();
+        museumPresenter.filterArtworks(artistName, artworkType);
+    }
+
+    // Add getter methods for the filter fields
+    public String getFilterArtistName() {
+        return txtFilterArtist.getText().trim();
+    }
+
+    public String getFilterArtworkType() {
+        return txtFilterArtworkType.getText().trim();
     }
 
     // Implementarea metodelor din IMuseumGUI
