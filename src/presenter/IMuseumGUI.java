@@ -1,5 +1,7 @@
 package presenter;
 
+import java.util.List;
+
 public interface IMuseumGUI {
     // Metode pentru obținerea datelor din interfață
     String getArtistName();
@@ -39,4 +41,6 @@ public interface IMuseumGUI {
     void filterArtworksButtonClicked();
     String getFilterArtistName();
     String getFilterArtworkType();
+
+    void displayArtistArtworks(List<String> artworkTitles);
 }

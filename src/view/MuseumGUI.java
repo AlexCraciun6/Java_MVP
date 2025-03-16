@@ -6,6 +6,7 @@ import presenter.MuseumPresenter;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -20,6 +21,8 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
     private JComboBox<String> cbArtistFilter, cbArtworkFilter;
     private JTextField txtFilterArtist, txtFilterArtworkType;
     private JButton btnFilterArtworks;
+    private JList<String> lstArtistArtworks;
+    private DefaultListModel<String> artistArtworksListModel;
 
 
     private MuseumPresenter museumPresenter;
@@ -98,6 +101,10 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
         txtFilterArtist = new JTextField(15);
         txtFilterArtworkType = new JTextField(15);
         btnFilterArtworks = new JButton("Apply Filters");
+
+        artistArtworksListModel = new DefaultListModel<>();
+        lstArtistArtworks = new JList<>(artistArtworksListModel);
+        lstArtistArtworks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
 
     private void registerListeners() {
@@ -126,6 +133,7 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
         btnFilterArtworks.addActionListener(e -> filterArtworksButtonClicked());
 
         // Implementare selectare rând în tabele pentru a popula câmpurile
+        // Listener for artist selection to display their artworks
         tblArtists.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblArtists.getSelectedRow() != -1) {
                 int row = tblArtists.getSelectedRow();
@@ -134,6 +142,10 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
                 txtArtistBirthPlace.setText(tblArtists.getValueAt(row, 3).toString());
                 txtArtistNationality.setText(tblArtists.getValueAt(row, 4).toString());
                 txtArtistPhoto.setText(tblArtists.getValueAt(row, 5).toString());
+
+                // Get the artist ID and load their artworks
+                int artistId = Integer.parseInt(tblArtists.getValueAt(row, 0).toString());
+                loadArtistArtworks(artistId);
             }
         });
 
@@ -175,13 +187,24 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
         buttonPanel.add(btnDeleteArtist);
         buttonPanel.add(btnSearchArtist);
 
+        // Create a panel for the artist details and artworks list
+        JPanel artistDetailsPanel = new JPanel(new BorderLayout());
+        artistDetailsPanel.add(formPanel, BorderLayout.NORTH);
+
+        // Artist's artworks list
+        JPanel artworksListPanel = new JPanel(new BorderLayout());
+        artworksListPanel.setBorder(BorderFactory.createTitledBorder("Artist's Artworks"));
+        artworksListPanel.add(new JScrollPane(lstArtistArtworks), BorderLayout.CENTER);
+
+        artistDetailsPanel.add(artworksListPanel, BorderLayout.CENTER);
+        artistDetailsPanel.add(buttonPanel, BorderLayout.SOUTH);
+
         // Tabel pentru artiști
         JScrollPane scrollPane = new JScrollPane(tblArtists);
 
         // Adăugare componente în panoul principal
-        panel.add(formPanel, BorderLayout.NORTH);
-        panel.add(buttonPanel, BorderLayout.CENTER);
-        panel.add(scrollPane, BorderLayout.SOUTH);
+        panel.add(artistDetailsPanel, BorderLayout.NORTH);
+        panel.add(scrollPane, BorderLayout.CENTER);
 
         return panel;
     }
@@ -392,6 +415,20 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
     @Override
     public void loadArtworksButtonClicked() {
         museumPresenter.loadArtworks();
+    }
+
+    // Add method to load artworks for a specific artist
+    private void loadArtistArtworks(int artistId) {
+        museumPresenter.loadArtistArtworks(artistId);
+    }
+
+    // Add method to update the artist artworks list
+    @Override
+    public void displayArtistArtworks(List<String> artworkTitles) {
+        artistArtworksListModel.clear();
+        for (String title : artworkTitles) {
+            artistArtworksListModel.addElement(title);
+        }
     }
 
     public static void main(String[] args) {

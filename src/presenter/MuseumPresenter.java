@@ -5,6 +5,7 @@ import model.Artwork;
 import model.repository.ArtistRepository;
 import model.repository.ArtworkRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MuseumPresenter {
@@ -383,6 +384,25 @@ public class MuseumPresenter {
             }
         } catch (Exception e) {
             museumGUI.showMessage("Error", "Error filtering artworks: " + e.getMessage());
+        }
+    }
+
+    public void loadArtistArtworks(int artistId) {
+        try {
+            List<Artwork> artworks = artworkRepository.getArtworksByArtistId(artistId);
+            if (artworks.isEmpty()) {
+                museumGUI.showMessage("Info", "This artist has no artworks in the museum.");
+            } else {
+                // Create a list of artwork titles to display
+                List<String> artworkTitles = new ArrayList<>();
+                for (Artwork artwork : artworks) {
+                    artworkTitles.add(artwork.getTitlu() + " (" + artwork.getTip() + ")");
+                }
+                // Display the list of artworks
+                museumGUI.displayArtistArtworks(artworkTitles);
+            }
+        } catch (Exception e) {
+            museumGUI.showMessage("Error", "Failed to load artist's artworks: " + e.getMessage());
         }
     }
 }
