@@ -160,6 +160,16 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
                 txtArtworkImage1.setText(tblArtworks.getValueAt(row, 5).toString());
                 txtArtworkImage2.setText(tblArtworks.getValueAt(row, 6).toString());
                 txtArtworkImage3.setText(tblArtworks.getValueAt(row, 7).toString());
+
+                if (row != -1) {
+                    // Get the image URLs from the selected row
+                    String image1 = tblArtworks.getValueAt(row, 5).toString().trim();
+                    String image2 = tblArtworks.getValueAt(row, 6).toString().trim();
+                    String image3 = tblArtworks.getValueAt(row, 7).toString().trim();
+
+                    // Open the images in browser
+                    openImagesInBrowser(image1, image2, image3);
+                }
             }
         });
     }
@@ -442,6 +452,27 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
         artistArtworksListModel.clear();
         for (String title : artworkTitles) {
             artistArtworksListModel.addElement(title);
+        }
+    }
+
+    private void openImagesInBrowser(String... imageUrls) {
+        for (String url : imageUrls) {
+            if (url != null && !url.isEmpty() && !url.equals("w")) {
+                try {
+                    java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+                    if (desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {
+                        // Check if the URL starts with http:// or https://
+                        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                            url = "https://" + url;
+                        }
+                        desktop.browse(new java.net.URI(url));
+                    } else {
+                        this.showMessage("Error", "Desktop browsing is not supported on this platform.");
+                    }
+                } catch (Exception e) {
+                    this.showMessage("Error", "Failed to open URL: " + e.getMessage());
+                }
+            }
         }
     }
 
