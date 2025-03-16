@@ -345,7 +345,7 @@ public class MuseumPresenter {
             }
 
             String filePath = "artworks.csv";
-            boolean result = artistRepository.saveArtworksToCSV(artworks, filePath);
+            boolean result = artworkRepository.saveArtworksToCSV(artworks, filePath);
 
             if (result) {
                 museumGUI.showMessage("Success", "Artworks saved to CSV successfully!");
@@ -366,7 +366,7 @@ public class MuseumPresenter {
             }
 
             String filePath = "artworks.doc";
-            boolean result = artistRepository.saveArtworksToDOC(artworks, filePath);
+            boolean result = artworkRepository.saveArtworksToDOC(artworks, filePath);
 
             if (result) {
                 museumGUI.showMessage("Success", "Artworks saved to DOC successfully!");

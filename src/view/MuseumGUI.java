@@ -157,9 +157,26 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
                 txtArtworkTitle.setText(tblArtworks.getValueAt(row, 2).toString());
                 txtArtworkType.setText(tblArtworks.getValueAt(row, 3).toString());
                 txtArtworkDescription.setText(tblArtworks.getValueAt(row, 4).toString());
-                txtArtworkImage1.setText(tblArtworks.getValueAt(row, 5).toString());
-                txtArtworkImage2.setText(tblArtworks.getValueAt(row, 6).toString());
-                txtArtworkImage3.setText(tblArtworks.getValueAt(row, 7).toString());
+//                txtArtworkImage1.setText(tblArtworks.getValueAt(row, 5).toString());
+//                txtArtworkImage2.setText(tblArtworks.getValueAt(row, 6).toString());
+//                txtArtworkImage3.setText(tblArtworks.getValueAt(row, 7).toString());
+
+                try {
+                    // Get the image URLs and handle possible null values
+                    Object value1 = tblArtworks.getValueAt(row, 5);
+                    Object value2 = tblArtworks.getValueAt(row, 6);
+                    Object value3 = tblArtworks.getValueAt(row, 7);
+
+                    txtArtworkImage1.setText(value1 != null ? value1.toString() : "");
+                    txtArtworkImage2.setText(value2 != null ? value2.toString() : "");
+                    txtArtworkImage3.setText(value3 != null ? value3.toString() : "");
+                } catch (Exception ex) {
+                    // Handle any exceptions that might occur
+                    txtArtworkImage1.setText("");
+                    txtArtworkImage2.setText("");
+                    txtArtworkImage3.setText("");
+                    showMessage("Error", "Failed to load artwork image data: " + ex.getMessage());
+                }
 
                 if (row != -1) {
                     // Get the image URLs from the selected row
@@ -384,41 +401,49 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
     @Override
     public void addArtistButtonClicked() {
         museumPresenter.addArtist();
+        clearFilterFields();
     }
 
     @Override
     public void updateArtistButtonClicked() {
         museumPresenter.updateArtist();
+        clearFilterFields();
     }
 
     @Override
     public void deleteArtistButtonClicked() {
         museumPresenter.deleteArtist();
+        clearFilterFields();
     }
 
     @Override
     public void searchArtistButtonClicked() {
         museumPresenter.searchArtist();
+        clearFilterFields();
     }
 
     @Override
     public void addArtworkButtonClicked() {
         museumPresenter.addArtwork();
+        clearFilterFields();
     }
 
     @Override
     public void updateArtworkButtonClicked() {
         museumPresenter.updateArtwork();
+        clearFilterFields();
     }
 
     @Override
     public void deleteArtworkButtonClicked() {
         museumPresenter.deleteArtwork();
+        clearFilterFields();
     }
 
     @Override
     public void searchArtworkButtonClicked() {
         museumPresenter.searchArtwork();
+        clearFilterFields();
     }
 
     @Override
@@ -474,6 +499,29 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
                 }
             }
         }
+    }
+
+    private void clearArtistFields() {
+        txtArtistName.setText("");
+        txtArtistBirthDate.setText("");
+        txtArtistBirthPlace.setText("");
+        txtArtistNationality.setText("");
+        txtArtistPhoto.setText("");
+    }
+
+    private void clearArtworkFields() {
+        txtArtworkTitle.setText("");
+        txtArtworkArtistId.setText("");
+        txtArtworkType.setText("");
+        txtArtworkDescription.setText("");
+        txtArtworkImage1.setText("");
+        txtArtworkImage2.setText("");
+        txtArtworkImage3.setText("");
+    }
+
+    public void clearFilterFields() {
+        clearArtistFields();
+        clearArtworkFields();
     }
 
     public static void main(String[] args) {

@@ -1,0 +1,284 @@
+use case
+
+@startuml
+actor "User" as User
+
+rectangle "Museum Management System" {
+  (View artists list) as UC1
+  (Search artist by name) as UC2
+  (View artworks list) as UC3
+  (Search artwork by title) as UC4
+  (Filter artworks by artist/type) as UC5
+  (Add artist) as UC6
+  (Delete artist) as UC7
+  (Update artist) as UC8
+  (Add artwork) as UC9
+  (Delete artwork) as UC10
+  (Update artwork) as UC11
+  (Save artworks to CSV) as UC12
+  (Save artworks to DOC) as UC13
+  (View artist's artworks) as UC14
+  (Open artwork images in browser) as UC15
+}
+
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+User --> UC6
+User --> UC7
+User --> UC8
+User --> UC9
+User --> UC10
+User --> UC11
+User --> UC12
+User --> UC13
+User --> UC14
+User --> UC15
+
+UC1 ..> UC14 : <<include>>
+UC3 ..> UC15 : <<include>>
+@startuml
+
+
+entity-relationship diagram:
+
+@startuml
+entity "Artist" as Artist {
+  +id_artist : int
+  nume : string
+  data_nasterii : string
+  loc_nasterii : string
+  nationalitate : string
+  fotografie : string
+}
+
+entity "Artwork" as Artwork {
+  +id_artwork : int
+  artist_id : int <<FK>>
+  titlu : string
+  tip : string
+  descriere : string
+  imagine1 : string
+  imagine2 : string
+  imagine3 : string
+}
+
+Artist ||--o{ Artwork : "creates"
+@enduml
+
+
+class diagram:
+
+@startuml
+
+' Packages arranged horizontally
+package Model {
+  class Artist {
+    -idArtist: int
+    -nume: String
+    -dataNasterii: String
+    -locNasterii: String
+    -nationalitate: String
+    -fotografie: String
+    +Artist(idArtist: int, nume: String, dataNasterii: String, locNasterii: String, nationalitate: String, fotografie: String)
+    +getIdArtist(): int
+    +setIdArtist(idArtist: int): void
+    +getNume(): String
+    +setNume(nume: String): void
+    +getDataNasterii(): String
+    +setDataNasterii(dataNasterii: String): void
+    +getLocNasterii(): String
+    +setLocNasterii(locNasterii: String): void
+    +getNationalitate(): String
+    +setNationalitate(nationalitate: String): void
+    +getFotografie(): String
+    +setFotografie(fotografie: String): void
+  }
+
+  class Artwork {
+    -idArtwork: int
+    -artistId: int
+    -titlu: String
+    -tip: String
+    -descriere: String
+    -imagine1: String
+    -imagine2: String
+    -imagine3: String
+    +Artwork(idArtwork: int, artistId: int, titlu: String, tip: String, descriere: String, imagine1: String, imagine2: String, imagine3: String)
+    +getIdArtwork(): int
+    +setIdArtwork(idArtwork: int): void
+    +getArtistId(): int
+    +setArtistId(artistId: int): void
+    +getTitlu(): String
+    +setTitlu(titlu: String): void
+    +getTip(): String
+    +setTip(tip: String): void
+    +getDescriere(): String
+    +setDescriere(descriere: String): void
+    +getImagine1(): String
+    +setImagine1(imagine1: String): void
+    +getImagine2(): String
+    +setImagine2(imagine2: String): void
+    +getImagine3(): String
+    +setImagine3(imagine3: String): void
+  }
+}
+
+package Repository {
+  class Repository {
+    -connection: Connection
+    +Repository()
+    -connectToDatabase(): void
+    +openConnection(): void
+    +closeConnection(): void
+    +executeSQLCommand(sqlCommand: String): boolean
+    +executeSQLQuery(sqlQuery: String): ResultSet
+  }
+
+  class ArtistRepository {
+    -repository: Repository
+    +ArtistRepository()
+    +addArtist(artist: Artist): boolean
+    +deleteArtist(idArtist: int): boolean
+    +updateArtist(artist: Artist): boolean
+    +getAllArtists(): List<Artist>
+    +searchArtistByName(name: String): List<Artist>
+    +filterArtworks(artistName: String, artworkType: String): List<Artwork>
+  }
+
+  class ArtworkRepository {
+    -repository: Repository
+    +ArtworkRepository()
+    +addArtwork(artwork: Artwork): boolean
+    +deleteArtwork(idArtwork: int): boolean
+    +updateArtwork(artwork: Artwork): boolean
+    +getAllArtworks(): List<Artwork>
+    +searchArtworkByTitle(title: String): List<Artwork>
+    +getArtworksByArtistId(artistId: int): List<Artwork>
+    +saveArtworksToCSV(artworks: List<Artwork>, filePath: String): boolean
+    +saveArtworksToDOC(artworks: List<Artwork>, filePath: String): boolean
+  }
+}
+
+package Presenter {
+  interface IMuseumGUI {
+    +getArtistName(): String
+    +getArtistBirthDate(): String
+    +getArtistBirthPlace(): String
+    +getArtistNationality(): String
+    +getArtistPhoto(): String
+    +getArtworkTitle(): String
+    +getArtworkArtistId(): int
+    +getArtworkType(): String
+    +getArtworkDescription(): String
+    +getArtworkImage1(): String
+    +getArtworkImage2(): String
+    +getArtworkImage3(): String
+    +setArtistTable(data: Object[][], columnNames: String[]): void
+    +setArtworkTable(data: Object[][], columnNames: String[]): void
+    +showMessage(title: String, message: String): void
+    +addArtistButtonClicked(): void
+    +updateArtistButtonClicked(): void
+    +deleteArtistButtonClicked(): void
+    +searchArtistButtonClicked(): void
+    +addArtworkButtonClicked(): void
+    +updateArtworkButtonClicked(): void
+    +deleteArtworkButtonClicked(): void
+    +searchArtworkButtonClicked(): void
+    +saveArtworksToCSVButtonClicked(): void
+    +saveArtworksToDOCButtonClicked(): void
+    +loadArtistsButtonClicked(): void
+    +loadArtworksButtonClicked(): void
+    +filterArtworksButtonClicked(): void
+    +getFilterArtistName(): String
+    +getFilterArtworkType(): String
+    +displayArtistArtworks(artworkTitles: List<String>): void
+  }
+
+  class MuseumPresenter {
+    -museumGUI: IMuseumGUI
+    -artistRepository: ArtistRepository
+    -artworkRepository: ArtworkRepository
+    +MuseumPresenter(museumGUI: IMuseumGUI)
+    +addArtist(): void
+    +updateArtist(): void
+    +deleteArtist(): void
+    +searchArtist(): void
+    +addArtwork(): void
+    +updateArtwork(): void
+    +deleteArtwork(): void
+    +searchArtwork(): void
+    +loadArtists(): void
+    +loadArtworks(): void
+    -displayArtists(artists: List<Artist>): void
+    -displayArtworks(artworks: List<Artwork>): void
+    +saveArtworksToCSV(): void
+    +saveArtworksToDOC(): void
+    +filterArtworks(artistName: String, artworkType: String): void
+    +loadArtistArtworks(artistId: int): void
+  }
+}
+
+package View {
+  class MuseumGUI {
+    -txtArtistName: JTextField
+    -txtArtistBirthDate: JTextField
+    -txtArtistBirthPlace: JTextField
+    -txtArtistNationality: JTextField
+    -txtArtistPhoto: JTextField
+    -txtArtworkTitle: JTextField
+    -txtArtworkArtistId: JTextField
+    -txtArtworkType: JTextField
+    -txtArtworkDescription: JTextField
+    -txtArtworkImage1: JTextField
+    -txtArtworkImage2: JTextField
+    -txtArtworkImage3: JTextField
+    -btnAddArtist: JButton
+    -btnUpdateArtist: JButton
+    -btnDeleteArtist: JButton
+    -btnSearchArtist: JButton
+    -btnAddArtwork: JButton
+    -btnUpdateArtwork: JButton
+    -btnDeleteArtwork: JButton
+    -btnSearchArtwork: JButton
+    -btnSaveArtworksToCSV: JButton
+    -btnSaveArtworksToDOC: JButton
+    -btnLoadArtists: JButton
+    -btnLoadArtworks: JButton
+    -tblArtists: JTable
+    -tblArtworks: JTable
+    -txtFilterArtist: JTextField
+    -txtFilterArtworkType: JTextField
+    -btnFilterArtworks: JButton
+    -lstArtistArtworks: JList<String>
+    -artistArtworksListModel: DefaultListModel<String>
+    -museumPresenter: MuseumPresenter
+    +MuseumGUI()
+    -initComponents(): void
+    -registerListeners(): void
+    -createArtistPanel(): JPanel
+    -createArtworkPanel(): JPanel
+    -createButtonPanel(): JPanel
+    -createFilterPanel(): JPanel
+    -clearArtistFields(): void
+    -clearArtworkFields(): void
+    +clearFilterFields(): void
+    -openImagesInBrowser(imageUrls: String...): void
+    -loadArtistArtworks(artistId: int): void
+    +main(args: String[]): void
+  }
+}
+
+' Relationships
+Artist ||--o{ Artwork : creates
+ArtistRepository --> Repository
+ArtworkRepository --> Repository
+MuseumPresenter --> ArtistRepository
+MuseumPresenter --> ArtworkRepository
+MuseumPresenter --> IMuseumGUI
+MuseumGUI ..|> IMuseumGUI
+MuseumGUI --> MuseumPresenter
+
+@enduml

@@ -125,44 +125,4 @@ public class ArtistRepository {
 
         return artworks;
     }
-
-    // Metoda pentru salvarea listei de opere de artă în fișier CSV
-    public boolean saveArtworksToCSV(List<Artwork> artworks, String filePath) {
-        try (FileWriter writer = new FileWriter(filePath)) {
-            writer.write("ID,Titlu,Tip,Descriere,Imagine1,Imagine2,Imagine3\n");
-            for (Artwork artwork : artworks) {
-                writer.write(artwork.getIdArtwork() + ",");
-                writer.write(artwork.getTitlu() + ",");
-                writer.write(artwork.getTip() + ",");
-                writer.write(artwork.getDescriere() + ",");
-                writer.write(artwork.getImagine1() + ",");
-                writer.write(artwork.getImagine2() + ",");
-                writer.write(artwork.getImagine3() + "\n");
-            }
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // Metoda pentru salvarea listei de opere de artă în fișier DOC
-    public boolean saveArtworksToDOC(List<Artwork> artworks, String filePath) {
-        try (FileWriter writer = new FileWriter(filePath)) {
-            writer.write("Lista Opere de Artă\n\n");
-            for (Artwork artwork : artworks) {
-                writer.write("ID: " + artwork.getIdArtwork() + "\n");
-                writer.write("Titlu: " + artwork.getTitlu() + "\n");
-                writer.write("Tip: " + artwork.getTip() + "\n");
-                writer.write("Descriere: " + artwork.getDescriere() + "\n");
-                writer.write("Imagine 1: " + artwork.getImagine1() + "\n");
-                writer.write("Imagine 2: " + artwork.getImagine2() + "\n");
-                writer.write("Imagine 3: " + artwork.getImagine3() + "\n\n");
-            }
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 }
