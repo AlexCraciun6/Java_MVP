@@ -143,6 +143,7 @@ public class MuseumPresenter {
 
     public void addArtwork() {
         try {
+            int artistId = museumGUI.getArtworkArtistId();
             String title = museumGUI.getArtworkTitle();
             String type = museumGUI.getArtworkType();
             String description = museumGUI.getArtworkDescription();
@@ -150,13 +151,16 @@ public class MuseumPresenter {
             String image2 = museumGUI.getArtworkImage2();
             String image3 = museumGUI.getArtworkImage3();
 
+            if (artistId <= 0) {
+                museumGUI.showMessage("Error", "Please enter a valid Artist ID!");
+                return;
+            }
+
             if (title.isEmpty() || type.isEmpty() || description.isEmpty()) {
                 museumGUI.showMessage("Error", "Title, type, and description are required!");
                 return;
             }
 
-            // Presupunem că artistul este selectat din interfață
-            int artistId = 1; // Trebuie să obții ID-ul artistului selectat
             Artwork artwork = new Artwork(0, artistId, title, type, description, image1, image2, image3);
             boolean result = artworkRepository.addArtwork(artwork);
 
@@ -173,12 +177,18 @@ public class MuseumPresenter {
 
     public void updateArtwork() {
         try {
+            int artistId = museumGUI.getArtworkArtistId();
             String title = museumGUI.getArtworkTitle();
             String type = museumGUI.getArtworkType();
             String description = museumGUI.getArtworkDescription();
             String image1 = museumGUI.getArtworkImage1();
             String image2 = museumGUI.getArtworkImage2();
             String image3 = museumGUI.getArtworkImage3();
+
+            if (artistId <= 0) {
+                museumGUI.showMessage("Error", "Please enter a valid Artist ID!");
+                return;
+            }
 
             if (title.isEmpty() || type.isEmpty() || description.isEmpty()) {
                 museumGUI.showMessage("Error", "Title, type, and description are required!");
@@ -194,6 +204,7 @@ public class MuseumPresenter {
 
             // Actualizează opera de artă
             Artwork artwork = artworks.get(0);
+            artwork.setArtistId(artistId);
             artwork.setTitlu(title);
             artwork.setTip(type);
             artwork.setDescriere(description);

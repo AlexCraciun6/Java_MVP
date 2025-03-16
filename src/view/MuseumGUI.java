@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 
 public class MuseumGUI extends JFrame implements IMuseumGUI {
     private JTextField txtArtistName, txtArtistBirthDate, txtArtistBirthPlace, txtArtistNationality, txtArtistPhoto;
-    private JTextField txtArtworkTitle, txtArtworkType, txtArtworkDescription, txtArtworkImage1, txtArtworkImage2, txtArtworkImage3;
+    private JTextField txtArtworkTitle, txtArtworkArtistId, txtArtworkType, txtArtworkDescription, txtArtworkImage1, txtArtworkImage2, txtArtworkImage3;
     private JButton btnAddArtist, btnUpdateArtist, btnDeleteArtist, btnSearchArtist;
     private JButton btnAddArtwork, btnUpdateArtwork, btnDeleteArtwork, btnSearchArtwork;
     private JButton btnSaveArtworksToCSV, btnSaveArtworksToDOC;
@@ -64,6 +64,7 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
 
         // Câmpuri de text pentru operă de artă
         txtArtworkTitle = new JTextField(20);
+        txtArtworkArtistId = new JTextField(20);
         txtArtworkType = new JTextField(20);
         txtArtworkDescription = new JTextField(20);
         txtArtworkImage1 = new JTextField(20);
@@ -152,6 +153,7 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
         tblArtworks.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblArtworks.getSelectedRow() != -1) {
                 int row = tblArtworks.getSelectedRow();
+                txtArtworkArtistId.setText(tblArtworks.getValueAt(row, 1).toString()); // Artist ID is at column 1
                 txtArtworkTitle.setText(tblArtworks.getValueAt(row, 2).toString());
                 txtArtworkType.setText(tblArtworks.getValueAt(row, 3).toString());
                 txtArtworkDescription.setText(tblArtworks.getValueAt(row, 4).toString());
@@ -214,7 +216,9 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
         panel.setBorder(BorderFactory.createTitledBorder("Artworks"));
 
         // Formular pentru operă de artă
-        JPanel formPanel = new JPanel(new GridLayout(6, 2));
+        JPanel formPanel = new JPanel(new GridLayout(7, 2));
+        formPanel.add(new JLabel("Artist ID:"));
+        formPanel.add(txtArtworkArtistId);
         formPanel.add(new JLabel("Title:"));
         formPanel.add(txtArtworkTitle);
         formPanel.add(new JLabel("Type:"));
@@ -313,6 +317,16 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
     @Override
     public String getArtworkTitle() {
         return txtArtworkTitle.getText();
+    }
+
+    // Add a new getter method for the Artist ID
+    @Override
+    public int getArtworkArtistId() {
+        try {
+            return Integer.parseInt(txtArtworkArtistId.getText());
+        } catch (NumberFormatException e) {
+            return 0; // Default value if parsing fails
+        }
     }
 
     @Override

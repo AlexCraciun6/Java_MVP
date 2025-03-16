@@ -10,6 +10,7 @@ public interface IMuseumGUI {
     String getArtistNationality();
     String getArtistPhoto();
     String getArtworkTitle();
+    int getArtworkArtistId();
     String getArtworkType();
     String getArtworkDescription();
     String getArtworkImage1();
