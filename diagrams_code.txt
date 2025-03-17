@@ -1,4 +1,4 @@
-use case
+-- use case
 
 @startuml
 actor "User" as User
@@ -281,4 +281,103 @@ MuseumPresenter --> IMuseumGUI
 MuseumGUI ..|> IMuseumGUI
 MuseumGUI --> MuseumPresenter
 
+@enduml
+
+
+-- diagrama de activitati ----------------------------------------------------------------------------------------------
+
+-- adaugare artist
+
+@startuml
+title Add Artist Process
+
+start
+:User opens the application;
+
+:User enters artist information in form fields:
+- Name
+- Birth Date
+- Birth Place
+- Nationality
+- Photo URL;
+
+:User clicks "Add Artist" button;
+
+:GUI calls presenter.addArtist();
+
+:Presenter retrieves form data from text fields;
+
+if (Are all required fields filled?) then (yes)
+  :Create Artist object;
+  :Call artistRepository.addArtist();
+
+  if (Database operation successful?) then (yes)
+    :Show success message
+    "Artist added successfully!";
+    :Reload artists list in the table;
+    :Clear form fields;
+  else (no)
+    :Show error message
+    "Failed to add artist!";
+  endif
+
+else (no)
+  :Show error message
+    "All fields are required!";
+endif
+
+stop
+@enduml
+
+
+-- update artwork
+
+@startuml
+title Update Artwork Process
+
+start
+:User selects artwork from the artworks table;
+
+:Form fields are automatically populated with
+existing artwork data:
+- Artist ID
+- Title
+- Type
+- Description
+- Image URLs;
+
+:User modifies artwork information in form fields;
+
+:User clicks "Update Artwork" button;
+
+:GUI calls presenter.updateArtwork();
+
+:Presenter retrieves form data from text fields;
+
+if (Are all required fields filled?) then (yes)
+  :Search for artwork by title;
+
+  if (Artwork found?) then (yes)
+    :Create updated Artwork object;
+    :Call artworkRepository.updateArtwork();
+
+    if (Database operation successful?) then (yes)
+      :Show success message
+      "Artwork updated successfully!";
+      :Reload artworks list in the table;
+      :Clear form fields;
+    else (no)
+      :Show error message
+      "Failed to update artwork!";
+    endif
+  else (no)
+    :Show error message
+    "Artwork not found!";
+  endif
+else (no)
+  :Show error message
+  "Title, type, and description are required!";
+endif
+
+stop
 @enduml
