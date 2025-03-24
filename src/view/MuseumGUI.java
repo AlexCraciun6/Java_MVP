@@ -1,302 +1,402 @@
 package view;
 
+import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import presenter.IMuseumGUI;
 import presenter.MuseumPresenter;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.awt.Desktop;
+import java.net.URI;
 import java.util.List;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class MuseumGUI extends JFrame implements IMuseumGUI {
-    private JTextField txtArtistName, txtArtistBirthDate, txtArtistBirthPlace, txtArtistNationality, txtArtistPhoto;
-    private JTextField txtArtworkTitle, txtArtworkArtistId, txtArtworkType, txtArtworkDescription, txtArtworkImage1, txtArtworkImage2, txtArtworkImage3;
-    private JButton btnAddArtist, btnUpdateArtist, btnDeleteArtist, btnSearchArtist;
-    private JButton btnAddArtwork, btnUpdateArtwork, btnDeleteArtwork, btnSearchArtwork;
-    private JButton btnSaveArtworksToCSV, btnSaveArtworksToDOC;
-    private JButton btnLoadArtists, btnLoadArtworks;
-    private JTable tblArtists, tblArtworks;
-    private JComboBox<String> cbArtistFilter, cbArtworkFilter;
-    private JTextField txtFilterArtist, txtFilterArtworkType;
-    private JButton btnFilterArtworks;
-    private JList<String> lstArtistArtworks;
-    private DefaultListModel<String> artistArtworksListModel;
-
+public class MuseumGUI extends Application implements IMuseumGUI {
+    private TextField txtArtistName, txtArtistBirthDate, txtArtistBirthPlace, txtArtistNationality, txtArtistPhoto;
+    private TextField txtArtworkTitle, txtArtworkArtistId, txtArtworkType, txtArtworkDescription, txtArtworkImage1, txtArtworkImage2, txtArtworkImage3;
+    private Button btnAddArtist, btnUpdateArtist, btnDeleteArtist, btnSearchArtist;
+    private Button btnAddArtwork, btnUpdateArtwork, btnDeleteArtwork, btnSearchArtwork;
+    private Button btnSaveArtworksToCSV, btnSaveArtworksToDOC;
+    private Button btnLoadArtists, btnLoadArtworks;
+    private TableView<Object[]> tblArtists;
+    private TableView<Object[]> tblArtworks;
+    private ComboBox<String> cbArtistFilter, cbArtworkFilter;
+    private TextField txtFilterArtist, txtFilterArtworkType;
+    private Button btnFilterArtworks;
+    private ListView<String> lstArtistArtworks;
+    private ObservableList<String> artistArtworksListModel;
 
     private MuseumPresenter museumPresenter;
 
-    public MuseumGUI() {
-        // Configurare frame
-        setTitle("Museum Management System");
-        setSize(1200, 800);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
+    @Override
+    public void start(Stage primaryStage) {
+        // Configure stage
+        primaryStage.setTitle("Museum Management System");
+        primaryStage.setWidth(1200);
+        primaryStage.setHeight(800);
 
-        // Inițializare componente
+        // Initialize components
         initComponents();
 
-        // Adăugare componente în frame
-        add(createArtistPanel(), BorderLayout.WEST);
-        add(createArtworkPanel(), BorderLayout.CENTER);
-        add(createFilterPanel(), BorderLayout.NORTH);
-        add(createButtonPanel(), BorderLayout.SOUTH);
+        // Create main layout - change to SplitPane for horizontal division
+        SplitPane mainSplitPane = new SplitPane();
+        mainSplitPane.setOrientation(javafx.geometry.Orientation.HORIZONTAL);
 
-        // Inițializare Presenter
+        BorderPane leftPane = new BorderPane();
+        leftPane.setTop(createFilterPanel());
+        leftPane.setCenter(createArtistPanel());
+
+        // Add components to layout
+        mainSplitPane.getItems().addAll(leftPane, createArtworkPanel());
+        mainSplitPane.setDividerPositions(0.5);
+
+        // Bottom panel for global buttons
+        BorderPane mainLayout = new BorderPane();
+        mainLayout.setCenter(mainSplitPane);
+        mainLayout.setBottom(createButtonPanel());
+
+        // Create scene
+        Scene scene = new Scene(mainLayout);
+        primaryStage.setScene(scene);
+
+        // Initialize Presenter
         museumPresenter = new MuseumPresenter(this);
 
-        // Adăugare listeneri pentru butoane
+        // Register listeners
         registerListeners();
 
-
-        // Afișare frame
-        setVisible(true);
+        // Show stage
+        primaryStage.show();
     }
 
     private void initComponents() {
-        // Câmpuri de text pentru artist
-        txtArtistName = new JTextField(20);
-        txtArtistBirthDate = new JTextField(20);
-        txtArtistBirthPlace = new JTextField(20);
-        txtArtistNationality = new JTextField(20);
-        txtArtistPhoto = new JTextField(20);
+        // Text fields for artist
+        txtArtistName = new TextField();
+        txtArtistBirthDate = new TextField();
+        txtArtistBirthPlace = new TextField();
+        txtArtistNationality = new TextField();
+        txtArtistPhoto = new TextField();
 
-        // Câmpuri de text pentru operă de artă
-        txtArtworkTitle = new JTextField(20);
-        txtArtworkArtistId = new JTextField(20);
-        txtArtworkType = new JTextField(20);
-        txtArtworkDescription = new JTextField(20);
-        txtArtworkImage1 = new JTextField(20);
-        txtArtworkImage2 = new JTextField(20);
-        txtArtworkImage3 = new JTextField(20);
+        // Text fields for artwork
+        txtArtworkTitle = new TextField();
+        txtArtworkArtistId = new TextField();
+        txtArtworkType = new TextField();
+        txtArtworkDescription = new TextField();
+        txtArtworkImage1 = new TextField();
+        txtArtworkImage2 = new TextField();
+        txtArtworkImage3 = new TextField();
 
-        // Butoane
-        btnAddArtist = new JButton("Add Artist");
-        btnUpdateArtist = new JButton("Update Artist");
-        btnDeleteArtist = new JButton("Delete Artist");
-        btnSearchArtist = new JButton("Search Artist");
+        // Buttons
+        btnAddArtist = new Button("Add Artist");
+        btnUpdateArtist = new Button("Update Artist");
+        btnDeleteArtist = new Button("Delete Artist");
+        btnSearchArtist = new Button("Search Artist");
 
-        btnAddArtwork = new JButton("Add Artwork");
-        btnUpdateArtwork = new JButton("Update Artwork");
-        btnDeleteArtwork = new JButton("Delete Artwork");
-        btnSearchArtwork = new JButton("Search Artwork");
+        btnAddArtwork = new Button("Add Artwork");
+        btnUpdateArtwork = new Button("Update Artwork");
+        btnDeleteArtwork = new Button("Delete Artwork");
+        btnSearchArtwork = new Button("Search Artwork");
 
-        btnSaveArtworksToCSV = new JButton("Save to CSV");
-        btnSaveArtworksToDOC = new JButton("Save to DOC");
+        btnSaveArtworksToCSV = new Button("Save to CSV");
+        btnSaveArtworksToDOC = new Button("Save to DOC");
 
+        // Buttons for loading data
+        btnLoadArtists = new Button("Load Artists");
+        btnLoadArtworks = new Button("Load Artworks");
 
-        // Butoane pentru încărcarea datelor
-        btnLoadArtists = new JButton("Load Artists");
-        btnLoadArtworks = new JButton("Load Artworks");
+        // Tables
+        tblArtists = new TableView<>();
+        tblArtworks = new TableView<>();
 
-        // Tabele
-        tblArtists = new JTable();
-        tblArtworks = new JTable();
-
-        // Combobox-uri pentru filtrare
-        cbArtistFilter = new JComboBox<>(new String[]{"All", "By Name", "By Nationality"});
-        cbArtworkFilter = new JComboBox<>(new String[]{"All", "By Title", "By Type"});
+        // ComboBoxes for filtering
+        cbArtistFilter = new ComboBox<>(FXCollections.observableArrayList("All", "By Name", "By Nationality"));
+        cbArtworkFilter = new ComboBox<>(FXCollections.observableArrayList("All", "By Title", "By Type"));
 
         // Filter components
-        txtFilterArtist = new JTextField(15);
-        txtFilterArtworkType = new JTextField(15);
-        btnFilterArtworks = new JButton("Apply Filters");
+        txtFilterArtist = new TextField();
+        txtFilterArtist.setPrefWidth(150);
+        txtFilterArtworkType = new TextField();
+        txtFilterArtworkType.setPrefWidth(150);
+        btnFilterArtworks = new Button("Apply Filters");
 
-        artistArtworksListModel = new DefaultListModel<>();
-        lstArtistArtworks = new JList<>(artistArtworksListModel);
-        lstArtistArtworks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        // Artist artworks list
+        artistArtworksListModel = FXCollections.observableArrayList();
+        lstArtistArtworks = new ListView<>(artistArtworksListModel);
     }
 
     private void registerListeners() {
-        // Adăugare listeneri pentru butoanele legate de Artist
-        btnAddArtist.addActionListener(e -> addArtistButtonClicked());
-        btnUpdateArtist.addActionListener(e -> updateArtistButtonClicked());
-        btnDeleteArtist.addActionListener(e -> deleteArtistButtonClicked());
-        btnSearchArtist.addActionListener(e -> searchArtistButtonClicked());
+        // Artist buttons
+        btnAddArtist.setOnAction(e -> addArtistButtonClicked());
+        btnUpdateArtist.setOnAction(e -> updateArtistButtonClicked());
+        btnDeleteArtist.setOnAction(e -> deleteArtistButtonClicked());
+        btnSearchArtist.setOnAction(e -> searchArtistButtonClicked());
 
-        // Adăugare listeneri pentru butoanele legate de Artwork
-        btnAddArtwork.addActionListener(e -> addArtworkButtonClicked());
-        btnUpdateArtwork.addActionListener(e -> updateArtworkButtonClicked());
-        btnDeleteArtwork.addActionListener(e -> deleteArtworkButtonClicked());
-        btnSearchArtwork.addActionListener(e -> searchArtworkButtonClicked());
+        // Artwork buttons
+        btnAddArtwork.setOnAction(e -> addArtworkButtonClicked());
+        btnUpdateArtwork.setOnAction(e -> updateArtworkButtonClicked());
+        btnDeleteArtwork.setOnAction(e -> deleteArtworkButtonClicked());
+        btnSearchArtwork.setOnAction(e -> searchArtworkButtonClicked());
 
-        // Adăugare listeneri pentru butoanele de salvare
-        btnSaveArtworksToCSV.addActionListener(e -> saveArtworksToCSVButtonClicked());
-        btnSaveArtworksToDOC.addActionListener(e -> saveArtworksToDOCButtonClicked());
+        // Save buttons
+        btnSaveArtworksToCSV.setOnAction(e -> saveArtworksToCSVButtonClicked());
+        btnSaveArtworksToDOC.setOnAction(e -> saveArtworksToDOCButtonClicked());
 
-        btnLoadArtists.addActionListener(e -> loadArtistsButtonClicked());
+        // Load buttons
+        btnLoadArtists.setOnAction(e -> loadArtistsButtonClicked());
+        btnLoadArtworks.setOnAction(e -> loadArtworksButtonClicked());
 
-        // Listener pentru butonul de încărcare opere de artă
-        btnLoadArtworks.addActionListener(e -> loadArtworksButtonClicked());
+        // Filter button
+        btnFilterArtworks.setOnAction(e -> filterArtworksButtonClicked());
 
-        // Add listener for filter button
-        btnFilterArtworks.addActionListener(e -> filterArtworksButtonClicked());
+        // Table selection listeners
+        tblArtists.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                txtArtistName.setText((String) newSelection[1]);
+                txtArtistBirthDate.setText((String) newSelection[2]);
+                txtArtistBirthPlace.setText((String) newSelection[3]);
+                txtArtistNationality.setText((String) newSelection[4]);
+                txtArtistPhoto.setText((String) newSelection[5]);
 
-        // Implementare selectare rând în tabele pentru a popula câmpurile
-        // Listener for artist selection to display their artworks
-        tblArtists.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting() && tblArtists.getSelectedRow() != -1) {
-                int row = tblArtists.getSelectedRow();
-                txtArtistName.setText(tblArtists.getValueAt(row, 1).toString());
-                txtArtistBirthDate.setText(tblArtists.getValueAt(row, 2).toString());
-                txtArtistBirthPlace.setText(tblArtists.getValueAt(row, 3).toString());
-                txtArtistNationality.setText(tblArtists.getValueAt(row, 4).toString());
-                txtArtistPhoto.setText(tblArtists.getValueAt(row, 5).toString());
-
-                // Get the artist ID and load their artworks
-                int artistId = Integer.parseInt(tblArtists.getValueAt(row, 0).toString());
-                loadArtistArtworks(artistId);
+                // Load artist's artworks
+                loadArtistArtworks((Integer) newSelection[0]);
             }
         });
 
-        tblArtworks.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting() && tblArtworks.getSelectedRow() != -1) {
-                int row = tblArtworks.getSelectedRow();
-                txtArtworkArtistId.setText(tblArtworks.getValueAt(row, 1).toString()); // Artist ID is at column 1
-                txtArtworkTitle.setText(tblArtworks.getValueAt(row, 2).toString());
-                txtArtworkType.setText(tblArtworks.getValueAt(row, 3).toString());
-                txtArtworkDescription.setText(tblArtworks.getValueAt(row, 4).toString());
-//                txtArtworkImage1.setText(tblArtworks.getValueAt(row, 5).toString());
-//                txtArtworkImage2.setText(tblArtworks.getValueAt(row, 6).toString());
-//                txtArtworkImage3.setText(tblArtworks.getValueAt(row, 7).toString());
+        tblArtworks.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                txtArtworkArtistId.setText(String.valueOf(newSelection[1]));
+                txtArtworkTitle.setText((String) newSelection[2]);
+                txtArtworkType.setText((String) newSelection[3]);
+                txtArtworkDescription.setText((String) newSelection[4]);
+                txtArtworkImage1.setText((String) newSelection[5]);
+                txtArtworkImage2.setText((String) newSelection[6]);
+                txtArtworkImage3.setText((String) newSelection[7]);
 
-                try {
-                    // Get the image URLs and handle possible null values
-                    Object value1 = tblArtworks.getValueAt(row, 5);
-                    Object value2 = tblArtworks.getValueAt(row, 6);
-                    Object value3 = tblArtworks.getValueAt(row, 7);
-
-                    txtArtworkImage1.setText(value1 != null ? value1.toString() : "");
-                    txtArtworkImage2.setText(value2 != null ? value2.toString() : "");
-                    txtArtworkImage3.setText(value3 != null ? value3.toString() : "");
-                } catch (Exception ex) {
-                    // Handle any exceptions that might occur
-                    txtArtworkImage1.setText("");
-                    txtArtworkImage2.setText("");
-                    txtArtworkImage3.setText("");
-                    showMessage("Error", "Failed to load artwork image data: " + ex.getMessage());
-                }
-
-                if (row != -1) {
-                    // Get the image URLs from the selected row
-                    String image1 = tblArtworks.getValueAt(row, 5).toString().trim();
-                    String image2 = tblArtworks.getValueAt(row, 6).toString().trim();
-                    String image3 = tblArtworks.getValueAt(row, 7).toString().trim();
-
-                    // Open the images in browser
-                    openImagesInBrowser(image1, image2, image3);
-                }
+                // Open images in browser
+                openImagesInBrowser((String) newSelection[5], (String) newSelection[6], (String) newSelection[7]);
             }
         });
     }
 
+    private BorderPane createArtistPanel() {
+        BorderPane panel = new BorderPane();
+        panel.setPadding(new Insets(10));
 
-    private JPanel createArtistPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createTitledBorder("Artists"));
+        // Create a split pane for form and table
+        SplitPane splitPane = new SplitPane();
+        splitPane.setOrientation(javafx.geometry.Orientation.VERTICAL);
 
-        // Formular pentru artist
-        JPanel formPanel = new JPanel(new GridLayout(5, 2));
-        formPanel.add(new JLabel("Name:"));
-        formPanel.add(txtArtistName);
-        formPanel.add(new JLabel("Birth Date:"));
-        formPanel.add(txtArtistBirthDate);
-        formPanel.add(new JLabel("Birth Place:"));
-        formPanel.add(txtArtistBirthPlace);
-        formPanel.add(new JLabel("Nationality:"));
-        formPanel.add(txtArtistNationality);
-        formPanel.add(new JLabel("Photo:"));
-        formPanel.add(txtArtistPhoto);
+        // Artist form
+        GridPane formPanel = new GridPane();
+        formPanel.setHgap(10);
+        formPanel.setVgap(5);
+        formPanel.setPadding(new Insets(10));
 
-        // Butoane pentru artist
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(btnAddArtist);
-        buttonPanel.add(btnUpdateArtist);
-        buttonPanel.add(btnDeleteArtist);
-        buttonPanel.add(btnSearchArtist);
+        formPanel.add(new Label("Name:"), 0, 0);
+        formPanel.add(txtArtistName, 1, 0);
+        formPanel.add(new Label("Birth Date:"), 0, 1);
+        formPanel.add(txtArtistBirthDate, 1, 1);
+        formPanel.add(new Label("Birth Place:"), 0, 2);
+        formPanel.add(txtArtistBirthPlace, 1, 2);
+        formPanel.add(new Label("Nationality:"), 0, 3);
+        formPanel.add(txtArtistNationality, 1, 3);
+        formPanel.add(new Label("Photo:"), 0, 4);
+        formPanel.add(txtArtistPhoto, 1, 4);
 
-        // Create a panel for the artist details and artworks list
-        JPanel artistDetailsPanel = new JPanel(new BorderLayout());
-        artistDetailsPanel.add(formPanel, BorderLayout.NORTH);
+        // Artist buttons
+        HBox buttonPanel = new HBox(10);
+        buttonPanel.setPadding(new Insets(10));
+        buttonPanel.getChildren().addAll(btnAddArtist, btnUpdateArtist, btnDeleteArtist, btnSearchArtist);
 
         // Artist's artworks list
-        JPanel artworksListPanel = new JPanel(new BorderLayout());
-        artworksListPanel.setBorder(BorderFactory.createTitledBorder("Artist's Artworks"));
-        artworksListPanel.add(new JScrollPane(lstArtistArtworks), BorderLayout.CENTER);
+        VBox artworksListPanel = new VBox(5);
+        artworksListPanel.setPadding(new Insets(10));
+        artworksListPanel.getChildren().addAll(new Label("Artist's Artworks"), lstArtistArtworks);
+        lstArtistArtworks.setPrefHeight(100);
 
-        artistDetailsPanel.add(artworksListPanel, BorderLayout.CENTER);
-        artistDetailsPanel.add(buttonPanel, BorderLayout.SOUTH);
+        // Combine form and artworks list into top section
+        VBox artistDetailsPanel = new VBox(10);
+        artistDetailsPanel.getChildren().addAll(formPanel, artworksListPanel, buttonPanel);
 
-        // Tabel pentru artiști
-        JScrollPane scrollPane = new JScrollPane(tblArtists);
+        // Configure artists table
+        configureArtistsTable();
 
-        // Adăugare componente în panoul principal
-        panel.add(artistDetailsPanel, BorderLayout.NORTH);
-        panel.add(scrollPane, BorderLayout.CENTER);
+        // Set the divider position
+        splitPane.getItems().addAll(artistDetailsPanel, new ScrollPane(tblArtists));
+        splitPane.setDividerPositions(0.4);
 
-        return panel;
-    }
-
-    private JPanel createArtworkPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createTitledBorder("Artworks"));
-
-        // Formular pentru operă de artă
-        JPanel formPanel = new JPanel(new GridLayout(7, 2));
-        formPanel.add(new JLabel("Artist ID:"));
-        formPanel.add(txtArtworkArtistId);
-        formPanel.add(new JLabel("Title:"));
-        formPanel.add(txtArtworkTitle);
-        formPanel.add(new JLabel("Type:"));
-        formPanel.add(txtArtworkType);
-        formPanel.add(new JLabel("Description:"));
-        formPanel.add(txtArtworkDescription);
-        formPanel.add(new JLabel("Image 1:"));
-        formPanel.add(txtArtworkImage1);
-        formPanel.add(new JLabel("Image 2:"));
-        formPanel.add(txtArtworkImage2);
-        formPanel.add(new JLabel("Image 3:"));
-        formPanel.add(txtArtworkImage3);
-
-        // Butoane pentru operă de artă
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(btnAddArtwork);
-        buttonPanel.add(btnUpdateArtwork);
-        buttonPanel.add(btnDeleteArtwork);
-        buttonPanel.add(btnSearchArtwork);
-
-        // Tabel pentru opere de artă
-        JScrollPane scrollPane = new JScrollPane(tblArtworks);
-
-        // Adăugare componente în panoul principal
-        panel.add(formPanel, BorderLayout.NORTH);
-        panel.add(buttonPanel, BorderLayout.CENTER);
-        panel.add(scrollPane, BorderLayout.SOUTH);
+        panel.setCenter(splitPane);
 
         return panel;
     }
 
-    private JPanel createButtonPanel() {
-        JPanel panel = new JPanel();
-        panel.add(btnLoadArtists);
-        panel.add(btnLoadArtworks);
-        panel.add(btnSaveArtworksToCSV);
-        panel.add(btnSaveArtworksToDOC);
+    private BorderPane createArtworkPanel() {
+        BorderPane panel = new BorderPane();
+        panel.setPadding(new Insets(10));
+
+        // Split pane for form/buttons and table
+        SplitPane splitPane = new SplitPane();
+        splitPane.setOrientation(javafx.geometry.Orientation.VERTICAL);
+
+        // Artwork form
+        GridPane formPanel = new GridPane();
+        formPanel.setHgap(10);
+        formPanel.setVgap(5);
+        formPanel.setPadding(new Insets(10));
+
+        formPanel.add(new Label("Artist ID:"), 0, 0);
+        formPanel.add(txtArtworkArtistId, 1, 0);
+        formPanel.add(new Label("Title:"), 0, 1);
+        formPanel.add(txtArtworkTitle, 1, 1);
+        formPanel.add(new Label("Type:"), 0, 2);
+        formPanel.add(txtArtworkType, 1, 2);
+        formPanel.add(new Label("Description:"), 0, 3);
+        formPanel.add(txtArtworkDescription, 1, 3);
+        formPanel.add(new Label("Image 1:"), 0, 4);
+        formPanel.add(txtArtworkImage1, 1, 4);
+        formPanel.add(new Label("Image 2:"), 0, 5);
+        formPanel.add(txtArtworkImage2, 1, 5);
+        formPanel.add(new Label("Image 3:"), 0, 6);
+        formPanel.add(txtArtworkImage3, 1, 6);
+
+        // Artwork buttons
+        HBox buttonPanel = new HBox(10);
+        buttonPanel.setPadding(new Insets(10));
+        buttonPanel.getChildren().addAll(btnAddArtwork, btnUpdateArtwork, btnDeleteArtwork, btnSearchArtwork);
+
+        VBox topSection = new VBox(10);
+        topSection.getChildren().addAll(formPanel, buttonPanel);
+
+        // Artwork table
+        configureArtworksTable();
+
+        splitPane.getItems().addAll(topSection, new ScrollPane(tblArtworks));
+        splitPane.setDividerPositions(0.4);
+
+        panel.setCenter(splitPane);
+
         return panel;
     }
 
-    private JPanel createFilterPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel.setBorder(BorderFactory.createTitledBorder("Filter Artworks"));
+    private HBox createButtonPanel() {
+        HBox panel = new HBox(10);
+        panel.setPadding(new Insets(10));
+        panel.setAlignment(Pos.CENTER);
+        panel.getChildren().addAll(btnLoadArtists, btnLoadArtworks, btnSaveArtworksToCSV, btnSaveArtworksToDOC);
+        return panel;
+    }
 
-        panel.add(new JLabel("Artist Name:"));
-        panel.add(txtFilterArtist);
-        panel.add(new JLabel("Artwork Type:"));
-        panel.add(txtFilterArtworkType);
-        panel.add(btnFilterArtworks);
+    private HBox createFilterPanel() {
+        HBox panel = new HBox(10);
+        panel.setPadding(new Insets(10));
+        panel.setAlignment(Pos.CENTER_LEFT);
+
+        panel.getChildren().addAll(
+                new Label("Artist Name:"), txtFilterArtist,
+                new Label("Artwork Type:"), txtFilterArtworkType,
+                btnFilterArtworks
+        );
 
         return panel;
+    }
+
+    private void configureArtistsTable() {
+        // Create columns with explicit type casts
+        TableColumn<Object[], Integer> idCol = new TableColumn<>("ID");
+        idCol.setCellValueFactory(data -> {
+            Integer value = (Integer) data.getValue()[0];
+            return new javafx.beans.property.SimpleIntegerProperty(value).asObject();
+        });
+
+        TableColumn<Object[], String> nameCol = new TableColumn<>("Name");
+        nameCol.setCellValueFactory(data -> {
+            String value = (String) data.getValue()[1];
+            return new javafx.beans.property.SimpleStringProperty(value);
+        });
+
+        TableColumn<Object[], String> birthDateCol = new TableColumn<>("Birth Date");
+        birthDateCol.setCellValueFactory(data -> {
+            String value = (String) data.getValue()[2];
+            return new javafx.beans.property.SimpleStringProperty(value);
+        });
+
+        TableColumn<Object[], String> birthPlaceCol = new TableColumn<>("Birth Place");
+        birthPlaceCol.setCellValueFactory(data -> {
+            String value = (String) data.getValue()[3];
+            return new javafx.beans.property.SimpleStringProperty(value);
+        });
+
+        TableColumn<Object[], String> nationalityCol = new TableColumn<>("Nationality");
+        nationalityCol.setCellValueFactory(data -> {
+            String value = (String) data.getValue()[4];
+            return new javafx.beans.property.SimpleStringProperty(value);
+        });
+
+        TableColumn<Object[], String> photoCol = new TableColumn<>("Photo");
+        photoCol.setCellValueFactory(data -> {
+            String value = (String) data.getValue()[5];
+            return new javafx.beans.property.SimpleStringProperty(value);
+        });
+
+        tblArtists.getColumns().addAll(idCol, nameCol, birthDateCol, birthPlaceCol, nationalityCol, photoCol);
+    }
+
+    private void configureArtworksTable() {
+        // Create columns with explicit type casts
+        TableColumn<Object[], Integer> idCol = new TableColumn<>("ID");
+        idCol.setCellValueFactory(data -> {
+            Integer value = (Integer) data.getValue()[0];
+            return new javafx.beans.property.SimpleIntegerProperty(value).asObject();
+        });
+
+        TableColumn<Object[], Integer> artistIdCol = new TableColumn<>("Artist ID");
+        artistIdCol.setCellValueFactory(data -> {
+            Integer value = (Integer) data.getValue()[1];
+            return new javafx.beans.property.SimpleIntegerProperty(value).asObject();
+        });
+
+        TableColumn<Object[], String> titleCol = new TableColumn<>("Title");
+        titleCol.setCellValueFactory(data -> {
+            String value = (String) data.getValue()[2];
+            return new javafx.beans.property.SimpleStringProperty(value);
+        });
+
+        TableColumn<Object[], String> typeCol = new TableColumn<>("Type");
+        typeCol.setCellValueFactory(data -> {
+            String value = (String) data.getValue()[3];
+            return new javafx.beans.property.SimpleStringProperty(value);
+        });
+
+        TableColumn<Object[], String> descriptionCol = new TableColumn<>("Description");
+        descriptionCol.setCellValueFactory(data -> {
+            String value = (String) data.getValue()[4];
+            return new javafx.beans.property.SimpleStringProperty(value);
+        });
+
+        TableColumn<Object[], String> image1Col = new TableColumn<>("Image 1");
+        image1Col.setCellValueFactory(data -> {
+            String value = (String) data.getValue()[5];
+            return new javafx.beans.property.SimpleStringProperty(value);
+        });
+
+        TableColumn<Object[], String> image2Col = new TableColumn<>("Image 2");
+        image2Col.setCellValueFactory(data -> {
+            String value = (String) data.getValue()[6];
+            return new javafx.beans.property.SimpleStringProperty(value);
+        });
+
+        TableColumn<Object[], String> image3Col = new TableColumn<>("Image 3");
+        image3Col.setCellValueFactory(data -> {
+            String value = (String) data.getValue()[7];
+            return new javafx.beans.property.SimpleStringProperty(value);
+        });
+
+        tblArtworks.getColumns().addAll(idCol, artistIdCol, titleCol, typeCol, descriptionCol, image1Col, image2Col, image3Col);
     }
 
     @Override
@@ -306,16 +406,16 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
         museumPresenter.filterArtworks(artistName, artworkType);
     }
 
-    // Add getter methods for the filter fields
+    @Override
     public String getFilterArtistName() {
         return txtFilterArtist.getText().trim();
     }
 
+    @Override
     public String getFilterArtworkType() {
         return txtFilterArtworkType.getText().trim();
     }
 
-    // Implementarea metodelor din IMuseumGUI
     @Override
     public String getArtistName() {
         return txtArtistName.getText();
@@ -346,7 +446,6 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
         return txtArtworkTitle.getText();
     }
 
-    // Add a new getter method for the Artist ID
     @Override
     public int getArtworkArtistId() {
         try {
@@ -383,19 +482,29 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
 
     @Override
     public void setArtistTable(Object[][] data, String[] columnNames) {
-        DefaultTableModel model = new DefaultTableModel(data, columnNames);
-        tblArtists.setModel(model);
+        ObservableList<Object[]> artists = FXCollections.observableArrayList();
+        for (Object[] row : data) {
+            artists.add(row);
+        }
+        tblArtists.setItems(artists);
     }
 
     @Override
     public void setArtworkTable(Object[][] data, String[] columnNames) {
-        DefaultTableModel model = new DefaultTableModel(data, columnNames);
-        tblArtworks.setModel(model);
+        ObservableList<Object[]> artworks = FXCollections.observableArrayList();
+        for (Object[] row : data) {
+            artworks.add(row);
+        }
+        tblArtworks.setItems(artworks);
     }
 
     @Override
     public void showMessage(String title, String message) {
-        JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     @Override
@@ -466,31 +575,27 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
         museumPresenter.loadArtworks();
     }
 
-    // Add method to load artworks for a specific artist
     private void loadArtistArtworks(int artistId) {
         museumPresenter.loadArtistArtworks(artistId);
     }
 
-    // Add method to update the artist artworks list
     @Override
     public void displayArtistArtworks(List<String> artworkTitles) {
         artistArtworksListModel.clear();
-        for (String title : artworkTitles) {
-            artistArtworksListModel.addElement(title);
-        }
+        artistArtworksListModel.addAll(artworkTitles);
     }
 
     private void openImagesInBrowser(String... imageUrls) {
         for (String url : imageUrls) {
             if (url != null && !url.isEmpty() && !url.equals("w")) {
                 try {
-                    java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-                    if (desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {
+                    Desktop desktop = Desktop.getDesktop();
+                    if (desktop.isSupported(Desktop.Action.BROWSE)) {
                         // Check if the URL starts with http:// or https://
                         if (!url.startsWith("http://") && !url.startsWith("https://")) {
                             url = "https://" + url;
                         }
-                        desktop.browse(new java.net.URI(url));
+                        desktop.browse(new URI(url));
                     } else {
                         this.showMessage("Error", "Desktop browsing is not supported on this platform.");
                     }
@@ -502,21 +607,21 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
     }
 
     private void clearArtistFields() {
-        txtArtistName.setText("");
-        txtArtistBirthDate.setText("");
-        txtArtistBirthPlace.setText("");
-        txtArtistNationality.setText("");
-        txtArtistPhoto.setText("");
+        txtArtistName.clear();
+        txtArtistBirthDate.clear();
+        txtArtistBirthPlace.clear();
+        txtArtistNationality.clear();
+        txtArtistPhoto.clear();
     }
 
     private void clearArtworkFields() {
-        txtArtworkTitle.setText("");
-        txtArtworkArtistId.setText("");
-        txtArtworkType.setText("");
-        txtArtworkDescription.setText("");
-        txtArtworkImage1.setText("");
-        txtArtworkImage2.setText("");
-        txtArtworkImage3.setText("");
+        txtArtworkTitle.clear();
+        txtArtworkArtistId.clear();
+        txtArtworkType.clear();
+        txtArtworkDescription.clear();
+        txtArtworkImage1.clear();
+        txtArtworkImage2.clear();
+        txtArtworkImage3.clear();
     }
 
     public void clearFilterFields() {
@@ -525,6 +630,6 @@ public class MuseumGUI extends JFrame implements IMuseumGUI {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(MuseumGUI::new);
+        launch(args);
     }
 }
